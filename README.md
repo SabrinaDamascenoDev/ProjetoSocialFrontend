@@ -58,7 +58,6 @@ API
 * **Routes:** navegação e controle de acesso.
 * **Types:** tipagens compartilhadas.
 * **Utils:** funções auxiliares.
-* **Theme:** configuração visual do MUI.
 * **Lib:** configurações de bibliotecas.
 
 ## ▶️ Como rodar o projeto
@@ -66,8 +65,8 @@ API
 ### 1. Clone o repositório
 
 ```bash
-git clone <https://github.com/SabrinaDamascenoDev/ProjetoSocialFrontend.git>
-cd <ProjetoSocialFrontend>
+git clone https://github.com/SabrinaDamascenoDev/ProjetoSocialFrontend.git
+cd ProjetoSocialFrontend
 ```
 
 ### 2. Instale as dependências
@@ -102,11 +101,6 @@ http://localhost:5173
 npm run build
 ```
 
-### 6. Executar os testes
-
-```bash
-npm run test
-```
 
 ## 🎯 Objetivo
 
