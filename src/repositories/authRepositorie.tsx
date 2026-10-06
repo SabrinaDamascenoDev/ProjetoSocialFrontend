@@ -4,6 +4,7 @@ import type {
   LoginResponse,
 } from '../types/auth'
 
+// acessa a api
 export const authRepository = {
  async login(
   data: LoginPayload
