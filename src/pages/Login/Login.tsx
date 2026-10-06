@@ -13,6 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { toast } from "sonner";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { type LoginFormData, loginSchema } from "./schema";
@@ -39,7 +40,7 @@ export function Login() {
 
       console.log('logou')
     } catch {
-      setLoginError("Credenciais inválidas");
+      toast.error("Credenciais inválidas")
     }
   }
 
