@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -16,14 +16,30 @@ import {
 import { toast } from "sonner";
 
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { type LoginFormData, loginSchema } from "./schema";
 
 import logo from "../../assets/logo.png";
 
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    height: 58,
+    borderRadius: 1.5,
+  },
+  "& .MuiInputLabel-root": {
+    color: "text.primary",
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "secondary.main",
+  },
+};
+
 export function Login() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const [loginError, setLoginError] = useState("");
+  const [remember, setRemember] = useState(false);
 
   const {
     register,
@@ -33,14 +49,19 @@ export function Login() {
     resolver: zodResolver(loginSchema),
   });
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
   async function handleLogin(data: LoginFormData) {
     try {
       setLoginError("");
-      await login(data.username, data.password);
-
-      console.log('logou')
-    } catch {
-      toast.error("Credenciais inválidas")
+      await login(data.username, data.password, remember);
+    } catch (error) {
+      console.error("Erro no login:", error);
+      toast.error("Credenciais inválidas");
     }
   }
 
@@ -60,7 +81,7 @@ export function Login() {
           backgroundColor: "primary.main",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center", 
+          alignItems: "center",
           justifyContent: "center",
           px: { md: 6, lg: 8, xl: 10 },
           py: { md: 5, lg: 6 },
@@ -100,7 +121,7 @@ export function Login() {
               fontSize: { md: "2.1rem", lg: "2.8rem", xl: "3.3rem" },
               lineHeight: 1.18,
               fontWeight: 700,
-              textAlign: "left", 
+              textAlign: "left",
               width: "100%",
             }}
           >
@@ -114,25 +135,16 @@ export function Login() {
           </Typography>
         </Box>
       </Box>
+
       <Box
         sx={{
           flex: 1,
           minHeight: "100vh",
-
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-
-          px: {
-            xs: 3,
-            sm: 5,
-            md: 7,
-            lg: 10,
-            xl: 12,
-          },
-
+          px: { xs: 3, sm: 5, md: 7, lg: 10, xl: 12 },
           py: 5,
-
           boxSizing: "border-box",
         }}
       >
@@ -150,12 +162,7 @@ export function Login() {
             sx={{
               color: "text.primary",
               fontFamily: '"Montserrat", sans-serif',
-              fontSize: {
-                xs: "2rem",
-                sm: "2.3rem",
-                md: "2.6rem",
-                lg: "2.8rem",
-              },
+              fontSize: { xs: "2rem", sm: "2.3rem", md: "2.6rem", lg: "2.8rem" },
               fontWeight: 800,
               fontStyle: "normal",
               lineHeight: 1.1,
@@ -169,12 +176,7 @@ export function Login() {
           <Typography
             sx={{
               color: "text.primary",
-              fontSize: {
-                xs: "1.9rem",
-                sm: "2.2rem",
-                md: "2.5rem",
-                lg: "2.7rem",
-              },
+              fontSize: { xs: "1.9rem", sm: "2.2rem", md: "2.5rem", lg: "2.7rem" },
               fontWeight: 400,
               lineHeight: 1.1,
               mb: 0.8,
@@ -186,13 +188,7 @@ export function Login() {
           <Typography
             sx={{
               color: "text.primary",
-
-              fontSize: {
-                xs: "1rem",
-                md: "1.1rem",
-                lg: "1.2rem",
-              },
-
+              fontSize: { xs: "1rem", md: "1.1rem", lg: "1.2rem" },
               mb: 4,
             }}
           >
@@ -200,60 +196,29 @@ export function Login() {
           </Typography>
 
           {loginError && (
-            <Alert
-              severity="error"
-              sx={{
-                mb: 2.5,
-              }}
-            >
+            <Alert severity="error" sx={{ mb: 2.5 }}>
               {loginError}
             </Alert>
           )}
 
           <TextField
             label="E-mail"
-            type="username"
+            type="text"
+            autoComplete="username"
             {...register("username")}
             error={!!errors.username}
             helperText={errors.username?.message}
-            sx={{
-              mb: 2.2,
-
-              "& .MuiOutlinedInput-root": {
-                height: 58,
-                borderRadius: 1.5,
-              },
-
-              "& .MuiInputLabel-root": {
-                color: "text.primary",
-              },
-
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: "secondary.main",
-              },
-            }}
+            sx={{ ...fieldSx, mb: 2.2 }}
           />
 
           <TextField
             label="Senha"
             type="password"
+            autoComplete="current-password"
             {...register("password")}
             error={!!errors.password}
             helperText={errors.password?.message}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                height: 58,
-                borderRadius: 1.5,
-              },
-
-              "& .MuiInputLabel-root": {
-                color: "text.primary",
-              },
-
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: "secondary.main",
-              },
-            }}
+            sx={fieldSx}
           />
 
           <Box
@@ -266,14 +231,17 @@ export function Login() {
             }}
           >
             <FormControlLabel
-              control={<Checkbox />}
+              control={
+                <Checkbox
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
+              }
               label="Lembrar de mim"
               sx={{
                 m: 0,
                 color: "text.primary",
-                "& .MuiFormControlLabel-label": {
-                  fontSize: "0.95rem",
-                },
+                "& .MuiFormControlLabel-label": { fontSize: "0.95rem" },
               }}
             />
 
@@ -300,10 +268,7 @@ export function Login() {
               borderRadius: 1.5,
               fontSize: "1.5rem",
               fontWeight: 700,
-
-              "&:hover": {
-                backgroundColor: "primary.dark",
-              },
+              "&:hover": { backgroundColor: "primary.dark" },
             }}
           >
             {isSubmitting ? (
