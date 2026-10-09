@@ -1,18 +1,21 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import {Login} from '../pages/Login/Login';
-import {Home} from '../pages/Home/Home';
-import { PrivateRoute } from './PrivateRoute';
+import { Navigate, type RouteObject } from 'react-router-dom';
+import { Login } from '../pages/Login/Login';
 import { AcessoNegado } from './AcessoNegado';
+import { ModulePlaceholder } from '../pages/ModulePlaceholder';
 
-export const router = createBrowserRouter([
+export const routes: RouteObject[] = [
   { path: '/login', element: <Login /> },
   { path: '/acesso-negado', element: <AcessoNegado /> },
-
-  // só adm, usa o allowedRoles para dizer quais roles tem acesso
+  // Temporário durante o desenvolvimento da sidebar: restaurar PrivateRoute depois.
+  // Ao integrar permissões, proteger /agentes e exibir seu link apenas para ADM.
   {
-    element: <PrivateRoute allowedRoles={['Role.ADMINISTRADOR']}/>,
-    children: [{ path: '/', element: <Home /> }],
+    children: [
+      { index: true, element: <ModulePlaceholder title="Dashboard" /> },
+      { path: '/mapa', element: <ModulePlaceholder title="Mapa" /> },
+      { path: '/placas', element: <ModulePlaceholder title="Placas" /> },
+      { path: '/estatisticas', element: <ModulePlaceholder title="Estatísticas" /> },
+      { path: '/agentes', element: <ModulePlaceholder title="Agentes" /> },
+    ],
   },
-
   { path: '*', element: <Navigate to="/" replace /> },
-]);
+];
