@@ -22,7 +22,7 @@ const items = [
 
 export function Sidebar() {
   const [open, setOpen] = useState(false);
-  const { logout } = useAuth();
+  const { logout, role } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -31,26 +31,78 @@ export function Sidebar() {
     navigate('/login', { replace: true });
   }
 
-  const content = <div className="sidebar-content">
-    <div className="sidebar-brand"><img src={logo} alt="Caça Placas" /></div>
-    <nav className="sidebar-navigation" aria-label="Navegação principal">
-      {items.map(({ path, label, Icon }) => <NavLink key={path} to={path} end={path === '/'}
-        className="sidebar-link" onClick={() => setOpen(false)}>
-        <Icon aria-hidden="true" /><span>{label}</span>
-      </NavLink>)}
-    </nav>
-    <button className="sidebar-logout" type="button" onClick={handleLogout}>
-      <LogoutOutlinedIcon aria-hidden="true" /><span>Sair</span>
-    </button>
-  </div>;
+  const visibleItems = items.filter(
+    ({ path }) => path !== '/agentes' || role === 'ADMINISTRADOR'
+  );
 
-  return <>
-    <button className="sidebar-toggle" type="button" onClick={() => setOpen(true)}
-      aria-label="Abrir menu de navegação" aria-expanded={open} aria-controls={open ? 'mobile-sidebar' : undefined}>
-      <MenuIcon aria-hidden="true" /><span>Menu</span>
-    </button>
-    <aside className="sidebar-desktop">{content}</aside>
-    <Drawer className="sidebar-mobile" variant="temporary" open={open} onClose={() => setOpen(false)}
-      slotProps={{ paper: { className: 'sidebar-paper', id: 'mobile-sidebar', 'aria-label': 'Menu de navegação' } }}>{content}</Drawer>
-  </>;
+  const content = (
+    <div className="sidebar-content">
+      <div className="sidebar-brand">
+        <img src={logo} alt="Caça Placas" />
+      </div>
+
+      <nav
+        className="sidebar-navigation"
+        aria-label="Navegação principal"
+      >
+        {visibleItems.map(({ path, label, Icon }) => (
+          <NavLink
+            key={path}
+            to={path}
+            end={path === '/'}
+            className="sidebar-link"
+            onClick={() => setOpen(false)}
+          >
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+      </nav>
+
+      <button
+        className="sidebar-logout"
+        type="button"
+        onClick={handleLogout}
+      >
+        <LogoutOutlinedIcon aria-hidden="true" />
+        <span>Sair</span>
+      </button>
+    </div>
+  );
+
+  return (
+    <>
+      <button
+        className="sidebar-toggle"
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Abrir menu de navegação"
+        aria-expanded={open}
+        aria-controls={open ? 'mobile-sidebar' : undefined}
+      >
+        <MenuIcon aria-hidden="true" />
+        <span>Menu</span>
+      </button>
+
+      <aside className="sidebar-desktop">
+        {content}
+      </aside>
+
+      <Drawer
+        className="sidebar-mobile"
+        variant="temporary"
+        open={open}
+        onClose={() => setOpen(false)}
+        slotProps={{
+          paper: {
+            className: 'sidebar-paper',
+            id: 'mobile-sidebar',
+            'aria-label': 'Menu de navegação',
+          },
+        }}
+      >
+        {content}
+      </Drawer>
+    </>
+  );
 }

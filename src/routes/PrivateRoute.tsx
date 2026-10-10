@@ -15,8 +15,6 @@ export function PrivateRoute({ allowedRoles }: PrivateRouteProps) {
   if (allowedRoles && (!role || !allowedRoles.includes(role))) {
     return <Navigate to="/acesso-negado" replace />
   }
-
   console.log(role)
-
   return <Outlet />
 }
