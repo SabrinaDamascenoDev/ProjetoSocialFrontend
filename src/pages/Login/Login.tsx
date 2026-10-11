@@ -61,7 +61,14 @@ export function Login() {
       await login(data.username, data.password, remember);
     } catch (error) {
       console.error("Erro no login:", error);
-      toast.error("Credenciais inválidas");
+      toast.error("Credenciais inválidas", {
+        style: {
+          fontSize: "1.2rem",
+          padding: "20px 24px",
+          minHeight: "70px",
+          minWidth: "350px",
+        },
+      });
     }
   }
 
@@ -162,7 +169,12 @@ export function Login() {
             sx={{
               color: "text.primary",
               fontFamily: '"Montserrat", sans-serif',
-              fontSize: { xs: "2rem", sm: "2.3rem", md: "2.6rem", lg: "2.8rem" },
+              fontSize: {
+                xs: "2rem",
+                sm: "2.3rem",
+                md: "2.6rem",
+                lg: "2.8rem",
+              },
               fontWeight: 800,
               fontStyle: "normal",
               lineHeight: 1.1,
@@ -176,7 +188,12 @@ export function Login() {
           <Typography
             sx={{
               color: "text.primary",
-              fontSize: { xs: "1.9rem", sm: "2.2rem", md: "2.5rem", lg: "2.7rem" },
+              fontSize: {
+                xs: "1.9rem",
+                sm: "2.2rem",
+                md: "2.5rem",
+                lg: "2.7rem",
+              },
               fontWeight: 400,
               lineHeight: 1.1,
               mb: 0.8,
