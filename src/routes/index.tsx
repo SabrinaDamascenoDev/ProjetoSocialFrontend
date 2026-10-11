@@ -4,6 +4,7 @@ import { Login } from '../pages/Login/Login';
 import { AcessoNegado } from './AcessoNegado';
 import { PrivateRoute } from './PrivateRoute';
 import { ModulePlaceholder } from '../pages/ModulePlaceholder';
+import { Agentes } from '../pages/Agentes/Agentes';
 
 export const routes: RouteObject[] = [
   {
@@ -44,7 +45,7 @@ export const routes: RouteObject[] = [
     children: [
       {
         path: '/agentes',
-        element: <ModulePlaceholder title="Agentes" />,
+        element: < Agentes />,
       },
     ],
   },
