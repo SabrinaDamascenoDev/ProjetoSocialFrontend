@@ -1,3 +1,4 @@
+import { CreateAgentDialog } from '../../components/CreateAgentDialog';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -69,6 +70,7 @@ function CardResumo({ valor, rotulo, corAvatar, corIcone }: CardResumoProps) {
 }
 
 export function Agentes() {
+  const [criacaoAberta, setCriacaoAberta] = useState(false);
   const [agentes, setAgentes] = useState<Agente[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -143,7 +145,7 @@ export function Agentes() {
   );
 
   function handleCriar() {
-    // TODO: abrir formulário / navegar para criação de agente
+    setCriacaoAberta(true);
   }
 
   function handleEditar(agente: Agente) {
@@ -158,6 +160,7 @@ export function Agentes() {
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, width: '100%' }}>
+      {criacaoAberta && <CreateAgentDialog onClose={() => setCriacaoAberta(false)} onCreated={() => { setPagina(1); setTentativa(valor => valor + 1); }} />}
 
       <Box
         sx={{

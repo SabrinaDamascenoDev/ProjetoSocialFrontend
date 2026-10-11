@@ -2,6 +2,9 @@ import { agentesRepository } from '../repositories/agentesRepository';
 import type { Agente } from '../types/agente';
 
 export const agentesService = {
+  async criar(email: string) {
+    return agentesRepository.criar(email.trim());
+  },
   async listar(): Promise<Agente[]> {
     const agentes: Agente[] = [];
     const limit = 100;
