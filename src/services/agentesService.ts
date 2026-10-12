@@ -1,9 +1,9 @@
 import { agentesRepository } from '../repositories/agentesRepository';
-import type { Agente } from '../types/agente';
+import type { Agente, CriarAgentePayload } from '../types/agente';
 
 export const agentesService = {
-  async criar(email: string) {
-    return agentesRepository.criar(email.trim());
+  async criar(dados: CriarAgentePayload) {
+    return agentesRepository.criar({ nome: dados.nome.trim(), email: dados.email.trim() });
   },
   async listar(): Promise<Agente[]> {
     const agentes: Agente[] = [];

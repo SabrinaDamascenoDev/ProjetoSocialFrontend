@@ -348,9 +348,9 @@ export function Agentes() {
                         <IconButton
                           aria-label={`Editar ${agente.nome}`}
                           onClick={() => handleEditar(agente)}
-                          sx={{ color: 'success.main' }}
+                          sx={{ color: 'success.main', width: 44, height: 44, mr: 0.5 }}
                         >
-                          <EditOutlinedIcon />
+                          <EditOutlinedIcon sx={{ fontSize: 26 }} />
                         </IconButton>
                       </Tooltip>
 
@@ -358,9 +358,9 @@ export function Agentes() {
                         <IconButton
                           aria-label={`Excluir ${agente.nome}`}
                           onClick={() => handleExcluir(agente)}
-                          sx={{ color: 'error.main' }}
+                          sx={{ color: 'error.main', width: 44, height: 44 }}
                         >
-                          <DeleteOutlineIcon />
+                          <DeleteOutlineIcon sx={{ fontSize: 26 }} />
                         </IconButton>
                       </Tooltip>
                     </TableCell>
