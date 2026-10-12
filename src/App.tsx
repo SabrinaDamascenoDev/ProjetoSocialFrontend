@@ -10,12 +10,20 @@ import { Sidebar } from './components/Sidebar';
 function AppContent() {
   const { pathname } = useLocation();
   const content = useRoutes(routes);
-  const showSidebar = pathname !== '/login' && pathname !== '/acesso-negado';
 
-  return <>
-    {showSidebar && <Sidebar />}
-    {showSidebar ? <main className="sidebar-page">{content}</main> : content}
-  </>;
+  const hideSidebarRoutes = ['/login', '/acesso-negado'];
+  const hideSidebarPrefixes = ['/recuperar-senha', '/reset-password'];
+
+  const showSidebar =
+    !hideSidebarRoutes.includes(pathname) &&
+    !hideSidebarPrefixes.some((prefix) => pathname.startsWith(prefix));
+
+  return (
+    <>
+      {showSidebar && <Sidebar />}
+      {showSidebar ? <main className="sidebar-page">{content}</main> : content}
+    </>
+  );
 }
 
 export default function App() {
