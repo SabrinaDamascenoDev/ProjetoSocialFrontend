@@ -10,6 +10,35 @@ import { agentesService } from '../services/agentesService';
 
 type Props = { onClose: () => void; onCreated: () => void };
 
+const fieldSx = {
+  '& .MuiOutlinedInput-root': {
+    height: 58,
+    borderRadius: 1.5,
+  },
+  '& .MuiInputLabel-root': {
+    color: 'text.primary',
+  },
+  '& .MuiInputLabel-root.Mui-focused': {
+    color: 'secondary.main',
+  },
+};
+
+const paperSx = {
+  position: 'relative',
+  bgcolor: '#fff',
+  borderRadius: { xs: 3, sm: '32px' },
+  maxWidth: 520,
+  m: 2,
+  width: 'calc(100% - 32px)',
+};
+
+const closeBtnSx = {
+  position: 'absolute',
+  right: { xs: 12, sm: 24 },
+  top: { xs: 12, sm: 20 },
+  color: '#011025',
+};
+
 export function CreateAgentDialog({ onClose, onCreated }: Props) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -52,46 +81,67 @@ export function CreateAgentDialog({ onClose, onCreated }: Props) {
     }
   }
 
-  if (createdEmail) return <Dialog open onClose={onClose} fullWidth maxWidth="md"
+  if (createdEmail) return <Dialog open onClose={onClose} fullWidth maxWidth="sm"
     aria-labelledby="agent-success-title" aria-describedby="agent-success-description"
-    slotProps={{ paper: { sx: { position: 'relative', bgcolor: '#fff', borderRadius: { xs: 4, sm: '56px' }, maxWidth: 716, m: 2, width: 'calc(100% - 32px)' } } }}>
-    <IconButton autoFocus aria-label="Fechar confirmação" onClick={onClose} sx={{ position: 'absolute', right: { xs: 16, sm: 36 }, top: { xs: 16, sm: 28 }, color: '#011025' }}>
+    slotProps={{ paper: { sx: paperSx } }}>
+    <IconButton autoFocus aria-label="Fechar confirmação" onClick={onClose} sx={closeBtnSx}>
       <CloseIcon />
     </IconButton>
-    <DialogContent sx={{ textAlign: 'center', px: { xs: 3, sm: 5.5 }, pt: { xs: 9, sm: 14 }, pb: { xs: 4, sm: 12 } }}>
-      <Box aria-hidden="true" sx={{ width: 116, height: 116, borderRadius: '18px', background: 'radial-gradient(circle, #d6ffcd 20%, #a8d5a4 100%)', display: 'grid', placeItems: 'center', mx: 'auto', mb: 6 }}>
-        <CheckRoundedIcon sx={{ color: '#289614', fontSize: 84 }} />
+    <DialogContent sx={{ textAlign: 'center', px: { xs: 3, sm: 4.5 }, pt: { xs: 7, sm: 9 }, pb: { xs: 4, sm: 6 } }}>
+      <Box aria-hidden="true" sx={{ width: 88, height: 88, borderRadius: '16px', background: 'radial-gradient(circle, #d6ffcd 20%, #a8d5a4 100%)', display: 'grid', placeItems: 'center', mx: 'auto', mb: 4 }}>
+        <CheckRoundedIcon sx={{ color: '#289614', fontSize: 64 }} />
       </Box>
-      <Typography id="agent-success-title" component="h2" sx={{ color: '#011025', fontWeight: 700, fontSize: { xs: 26, sm: 34 }, lineHeight: 1.2, mb: 1.5 }}>Agente criado com sucesso!</Typography>
-      <Box id="agent-success-description" sx={{ color: '#687b98', fontSize: { xs: 18, sm: 24 }, lineHeight: 1.2 }}>
+      <Typography id="agent-success-title" component="h2" sx={{ color: '#011025', fontWeight: 700, fontSize: { xs: 22, sm: 28 }, lineHeight: 1.2, mb: 1.5 }}>Agente criado com sucesso!</Typography>
+      <Box id="agent-success-description" sx={{ color: '#687b98', fontSize: { xs: 16, sm: 18 }, lineHeight: 1.3 }}>
         <Typography sx={{ font: 'inherit' }}>A conta foi cadastrada para:</Typography>
         <Typography sx={{ fontSize: 'inherit', fontWeight: 700, overflowWrap: 'anywhere' }}>{createdEmail}</Typography>
-        <Typography sx={{ font: 'inherit', mt: 3 }}>A senha de acesso é gerada pelo sistema.</Typography>
+        <Typography sx={{ font: 'inherit', mt: 2 }}>A senha de acesso é gerada pelo sistema.</Typography>
       </Box>
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 3, mt: 6 }}>
-        <Button onClick={() => { setNome(''); setEmail(''); setInvalidField(null); setCreatedEmail(null); }} sx={{ flex: 1, bgcolor: '#d9d9d9', color: '#011025', fontSize: { xs: 20, sm: 22 }, fontWeight: 700, height: 'auto', minHeight: 64, px: 3, py: 2, lineHeight: 1.3, '&:hover': { bgcolor: '#c9c9c9' } }}>Criar novo agente</Button>
-        <Button onClick={onClose} sx={{ flex: 1, bgcolor: '#011025', fontSize: { xs: 20, sm: 22 }, fontWeight: 700, height: 'auto', minHeight: 64, px: 3, py: 2, lineHeight: 1.3 }}>Ir para a lista de agentes</Button>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mt: 4 }}>
+        <Button onClick={() => { setNome(''); setEmail(''); setInvalidField(null); setCreatedEmail(null); }} sx={{ flex: 1, bgcolor: '#d9d9d9', color: '#011025', fontSize: { xs: 16, sm: 18 }, fontWeight: 700, height: 'auto', minHeight: 52, px: 2, py: 1.5, lineHeight: 1.3, borderRadius: 1.5, '&:hover': { bgcolor: '#c9c9c9' } }}>Criar novo agente</Button>
+        <Button onClick={onClose} sx={{ flex: 1, bgcolor: '#011025', fontSize: { xs: 16, sm: 18 }, fontWeight: 700, height: 'auto', minHeight: 52, px: 2, py: 1.5, lineHeight: 1.3, borderRadius: 1.5 }}>Ir para a lista de agentes</Button>
       </Box>
     </DialogContent>
   </Dialog>;
 
-  return <Dialog open onClose={() => { if (!pending.current) onClose(); }} fullWidth maxWidth="md"
+  return <Dialog open onClose={() => { if (!pending.current) onClose(); }} fullWidth maxWidth="sm"
     aria-label="Criar agente"
-    slotProps={{ paper: { sx: { position: 'relative', bgcolor: '#fff', borderRadius: { xs: 4, sm: '56px' }, maxWidth: 716, m: 2, width: 'calc(100% - 32px)' } } }}>
-    <IconButton aria-label="Fechar cadastro" disabled={submitting} onClick={onClose}
-      sx={{ position: 'absolute', right: { xs: 16, sm: 36 }, top: { xs: 16, sm: 28 }, color: '#011025' }}><CloseIcon /></IconButton>
-    <Box component="form" onSubmit={submit} noValidate sx={{ px: { xs: 3, sm: 8 }, pt: { xs: 9, sm: 14 }, pb: { xs: 5, sm: 16 } }}>
-      <Typography component="label" htmlFor="agent-name" sx={{ display: 'block', fontSize: { xs: 24, sm: 30 }, fontWeight: 600, mb: 1 }}>Nome Completo</Typography>
-      <TextField id="agent-name" autoFocus required fullWidth placeholder="Insira o seu nome completo..." autoComplete="name"
-        value={nome} disabled={submitting} error={invalidField === 'nome'}
+    slotProps={{ paper: { sx: paperSx } }}>
+    <IconButton aria-label="Fechar cadastro" disabled={submitting} onClick={onClose} sx={closeBtnSx}><CloseIcon /></IconButton>
+    <Box component="form" onSubmit={submit} noValidate sx={{ px: { xs: 3, sm: 5 }, pt: { xs: 8, sm: 10 }, pb: { xs: 4, sm: 6 }, display: 'flex', flexDirection: 'column' }}>
+      <TextField
+        id="agent-name"
+        label="Nome completo"
+        autoFocus
+        required
+        fullWidth
+        autoComplete="name"
+        value={nome}
+        disabled={submitting}
+        error={invalidField === 'nome'}
         onChange={event => { setNome(event.target.value); setInvalidField(null); }}
-        sx={{ mb: 3, '& .MuiOutlinedInput-root': { bgcolor: '#d9d9d9', height: 48 }, '& fieldset': { borderColor: 'transparent' } }} />
-      <Typography component="label" htmlFor="agent-email" sx={{ display: 'block', fontSize: { xs: 24, sm: 30 }, fontWeight: 600, mb: 1 }}>E-mail</Typography>
-      <TextField id="agent-email" required fullWidth type="email" placeholder="exemplo@gmail.com" autoComplete="email"
-        value={email} disabled={submitting} error={invalidField === 'email'}
+        sx={{ ...fieldSx, mb: 2.2 }}
+      />
+      <TextField
+        id="agent-email"
+        label="E-mail"
+        required
+        fullWidth
+        type="email"
+        autoComplete="email"
+        value={email}
+        disabled={submitting}
+        error={invalidField === 'email'}
         onChange={event => { setEmail(event.target.value); setInvalidField(null); }}
-        sx={{ '& .MuiOutlinedInput-root': { bgcolor: '#d9d9d9', height: 48 }, '& fieldset': { borderColor: 'transparent' } }} />
-      <Button fullWidth type="submit" disabled={submitting} sx={{ mt: { xs: 5, sm: 8 }, bgcolor: '#011025', fontWeight: 700, fontSize: 22, minHeight: 64, height: 'auto', py: 2 }}>
+        sx={fieldSx}
+      />
+      <Button
+        fullWidth
+        type="submit"
+        variant="contained"
+        disabled={submitting}
+        sx={{ mt: { xs: 4, sm: 5 }, height: 58, borderRadius: 1.5, fontSize: '1.3rem', fontWeight: 700, '&:hover': { bgcolor: 'primary.dark' } }}
+      >
         {submitting ? 'Criando…' : 'Criar Agente'}
       </Button>
     </Box>
