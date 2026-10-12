@@ -11,3 +11,7 @@ export interface UsuarioResponse {
 export type Agente = UsuarioResponse & {
   role: 'AGENTE';
 };
+export interface CriarAgentePayload {
+  nome: string;
+  email: string;
+}

@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { toast } from "sonner";
+import { toastOptions } from "../../lib/toastOptions";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -61,14 +62,7 @@ export function Login() {
       await login(data.username, data.password, remember);
     } catch (error) {
       console.error("Erro no login:", error);
-      toast.error("Credenciais inválidas", {
-        style: {
-          fontSize: "1.2rem",
-          padding: "20px 24px",
-          minHeight: "70px",
-          minWidth: "350px",
-        },
-      });
+      toast.error("Credenciais inválidas", toastOptions);
     }
   }
 
