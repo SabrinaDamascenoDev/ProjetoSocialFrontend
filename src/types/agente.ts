@@ -15,3 +15,8 @@ export interface CriarAgentePayload {
   nome: string;
   email: string;
 }
+
+export interface EditarAgentePayload {
+  nome: string;
+  email: string;
+}
