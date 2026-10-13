@@ -1,4 +1,6 @@
 import { CreateAgentDialog } from '../../components/CreateAgentDialog';
+import { EditAgentDialog } from '../../components/EditAgentDialog';
+import { AgentStatusDialog } from '../../components/AgentStatusDialog';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -25,11 +27,12 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import PersonOffOutlinedIcon from '@mui/icons-material/PersonOffOutlined';
+import PersonAddAlt1OutlinedIcon from '@mui/icons-material/PersonAddAlt1Outlined';
 import PersonIcon from '@mui/icons-material/Person';
 
 import { agentesService } from '../../services/agentesService';
-import type { Agente } from '../../types/agente';
+import type { Agente, UsuarioResponse } from '../../types/agente';
 
 type FiltroSituacao = 'todos' | 'ativos' | 'inativos';
 
@@ -71,6 +74,8 @@ function CardResumo({ valor, rotulo, corAvatar, corIcone }: CardResumoProps) {
 
 export function Agentes() {
   const [criacaoAberta, setCriacaoAberta] = useState(false);
+  const [agenteEmEdicao, setAgenteEmEdicao] = useState<Agente | null>(null);
+  const [agenteEmAlteracaoStatus, setAgenteEmAlteracaoStatus] = useState<Agente | null>(null);
   const [agentes, setAgentes] = useState<Agente[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -139,9 +144,10 @@ export function Agentes() {
     Math.ceil(agentesFiltrados.length / ITENS_POR_PAGINA),
   );
 
+  const paginaAtual = Math.min(pagina, totalPaginas);
   const agentesDaPagina = agentesFiltrados.slice(
-    (pagina - 1) * ITENS_POR_PAGINA,
-    pagina * ITENS_POR_PAGINA,
+    (paginaAtual - 1) * ITENS_POR_PAGINA,
+    paginaAtual * ITENS_POR_PAGINA,
   );
 
   function handleCriar() {
@@ -149,18 +155,29 @@ export function Agentes() {
   }
 
   function handleEditar(agente: Agente) {
-    // TODO: abrir edição do agente
-    void agente;
+    setAgenteEmEdicao(agente);
   }
 
-  function handleExcluir(agente: Agente) {
-    // TODO: confirmar e excluir o agente
-    void agente;
+  function handleAlterarStatus(agente: Agente) {
+    setAgenteEmAlteracaoStatus(agente);
+  }
+
+  function handleAgenteAtualizado(atualizado: UsuarioResponse) {
+    setAgentes(atuais => atuais.map(agente => agente.id === atualizado.id
+      ? { ...agente, nome: atualizado.nome, email: atualizado.email, is_active: atualizado.is_active }
+      : agente));
+    setAgenteEmEdicao(null);
+    setAgenteEmAlteracaoStatus(null);
+    setPagina(paginaAtual);
   }
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, width: '100%' }}>
       {criacaoAberta && <CreateAgentDialog onClose={() => setCriacaoAberta(false)} onCreated={() => { setPagina(1); setTentativa(valor => valor + 1); }} />}
+      {agenteEmEdicao && <EditAgentDialog key={agenteEmEdicao.id} agente={agenteEmEdicao}
+        onClose={() => setAgenteEmEdicao(null)} onSaved={handleAgenteAtualizado} />}
+      {agenteEmAlteracaoStatus && <AgentStatusDialog key={agenteEmAlteracaoStatus.id} agente={agenteEmAlteracaoStatus}
+        onClose={() => setAgenteEmAlteracaoStatus(null)} onStatusChanged={handleAgenteAtualizado} />}
 
       <Box
         sx={{
@@ -354,13 +371,15 @@ export function Agentes() {
                         </IconButton>
                       </Tooltip>
 
-                      <Tooltip title="Excluir">
+                      <Tooltip title={agente.is_active ? 'Desativar' : 'Reativar'}>
                         <IconButton
-                          aria-label={`Excluir ${agente.nome}`}
-                          onClick={() => handleExcluir(agente)}
-                          sx={{ color: 'error.main', width: 44, height: 44 }}
+                          aria-label={`${agente.is_active ? 'Desativar' : 'Reativar'} ${agente.nome}`}
+                          onClick={() => handleAlterarStatus(agente)}
+                          sx={{ color: agente.is_active ? 'error.main' : 'success.main', width: 44, height: 44 }}
                         >
-                          <DeleteOutlineIcon sx={{ fontSize: 26 }} />
+                          {agente.is_active
+                            ? <PersonOffOutlinedIcon sx={{ fontSize: 26 }} />
+                            : <PersonAddAlt1OutlinedIcon sx={{ fontSize: 26 }} />}
                         </IconButton>
                       </Tooltip>
                     </TableCell>
@@ -376,7 +395,7 @@ export function Agentes() {
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
           <Pagination
             count={totalPaginas}
-            page={pagina}
+            page={paginaAtual}
             onChange={(_, valor) => setPagina(valor)}
             color="primary"
             shape="rounded"

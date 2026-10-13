@@ -1,7 +1,16 @@
 import { agentesRepository } from '../repositories/agentesRepository';
-import type { Agente, CriarAgentePayload } from '../types/agente';
+import type { Agente, CriarAgentePayload, EditarAgentePayload } from '../types/agente';
 
 export const agentesService = {
+  async editar(id: number, dados: EditarAgentePayload) {
+    return agentesRepository.editar(id, {
+      nome: dados.nome.trim(),
+      email: dados.email.trim(),
+    });
+  },
+  async atualizarStatus(id: number, isActive: boolean) {
+    return agentesRepository.atualizarStatus(id, isActive);
+  },
   async criar(dados: CriarAgentePayload) {
     return agentesRepository.criar({ nome: dados.nome.trim(), email: dados.email.trim() });
   },
