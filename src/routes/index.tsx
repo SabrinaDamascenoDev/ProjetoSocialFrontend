@@ -9,6 +9,7 @@ import { RecuperarSenha } from '../pages/RecuperarSenha/RecuperarSenha';
 import { EmailEnviado } from '../pages/RecuperarSenha/EmailEnviado';
 import { RedefinirSenha } from '../pages/RecuperarSenha/RedefinirSenha';
 import { SenhaRedefinida } from '../pages/RecuperarSenha/SenhaRedefinida';
+import { Placas } from '../pages/Placas/Placas';
 
 export const routes: RouteObject[] = [
   {
@@ -29,8 +30,6 @@ export const routes: RouteObject[] = [
     path: '/recuperar-senha/enviado',
     element: <EmailEnviado />,
   },
-  // ⚠️ A URL /reset-password precisa bater EXATAMENTE com o link
-  // gerado pelo backend em forgot_password (FRONTEND_URL + /reset-password)
   {
     path: '/reset-password',
     element: <RedefinirSenha />,
@@ -54,7 +53,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: '/placas',
-        element: <ModulePlaceholder title="Placas" />,
+        element: <Placas />,
       },
       {
         path: '/estatisticas',

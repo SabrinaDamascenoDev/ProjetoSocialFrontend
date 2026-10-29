@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Drawer } from '@mui/material';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import ReportOutlinedIcon from '@mui/icons-material/ReportOutlined';
 import ShowChartOutlinedIcon from '@mui/icons-material/ShowChartOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
@@ -14,7 +13,6 @@ import './Sidebar.css';
 
 const items = [
   { path: '/', label: 'Dashboard', Icon: HomeOutlinedIcon },
-  { path: '/mapa', label: 'Mapa', Icon: LocationOnOutlinedIcon },
   { path: '/placas', label: 'Placas', Icon: ReportOutlinedIcon },
   { path: '/estatisticas', label: 'Estatísticas', Icon: ShowChartOutlinedIcon },
   { path: '/agentes', label: 'Agentes', Icon: PersonOutlinedIcon },
