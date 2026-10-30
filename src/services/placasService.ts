@@ -1,3 +1,4 @@
+import type { DetalhesPlaca } from '../types/detalhesPlaca';
 import { placasRepository } from '../repositories/placasRespository';
 import type {
   EstadoConservacao,
@@ -37,6 +38,34 @@ function paraPlaca(r: PlacaResponse): Placa {
 }
 
 export const placasService = {
+  async obterDetalhes(id: string): Promise<DetalhesPlaca | null> {
+    let pagina = 1;
+    let consultadas = 0;
+    while (true) {
+      const resposta = await placasRepository.listar({ page: pagina, page_size: 100 });
+      const item = resposta.items.find((placa) => placa.id === id);
+      if (item) {
+        const evento = item.ultimo_evento;
+        const responsavel = evento ? `Usuário #${evento.created_by}` : '—';
+        return {
+          placa: paraPlaca(item),
+          afastamento: item.afastamento == null ? '—' : `${item.afastamento} m`,
+          tipoPelicula: item.tipo_pelicula ?? '—',
+          tipoSubstrato: item.tipo_substrato ?? '—',
+          tipoSuporte: item.tipo_suporte ?? '—',
+          responsavel,
+          observacoes: evento?.observacao ?? '',
+          historico: evento ? [{
+            id: evento.id, data: evento.timestamp, tipo: evento.tipo_evento,
+            descricao: evento.observacao ?? '', responsavel, fotoUrl: evento.foto_url,
+          }] : [],
+        };
+      }
+      consultadas += resposta.items.length;
+      if (consultadas >= resposta.total || resposta.items.length === 0) return null;
+      pagina += 1;
+    }
+  },
   async listar(
     pagina: number,
     itensPorPagina: number,

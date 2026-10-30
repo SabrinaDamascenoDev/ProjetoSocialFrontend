@@ -9,6 +9,7 @@ import { RecuperarSenha } from '../pages/RecuperarSenha/RecuperarSenha';
 import { EmailEnviado } from '../pages/RecuperarSenha/EmailEnviado';
 import { RedefinirSenha } from '../pages/RecuperarSenha/RedefinirSenha';
 import { SenhaRedefinida } from '../pages/RecuperarSenha/SenhaRedefinida';
+import { DetalhesPlaca } from '../pages/Placas/DetalhesPlaca';
 import { Placas } from '../pages/Placas/Placas';
 
 export const routes: RouteObject[] = [
@@ -50,6 +51,10 @@ export const routes: RouteObject[] = [
       {
         path: '/mapa',
         element: <ModulePlaceholder title="Mapa" />,
+      },
+      {
+        path: '/placas/:id',
+        element: <DetalhesPlaca />,
       },
       {
         path: '/placas',
