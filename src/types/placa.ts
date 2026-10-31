@@ -8,6 +8,11 @@ export interface EnderecoResponse {
 }
 
 export interface UltimoEventoResponse {
+  id: string;
+  created_by: number;
+  tipo_evento: string;
+  observacao: string | null;
+  timestamp: string;
   foto_url: string | null;
   estado_conservacao: EstadoConservacao | null;
   estado_pelicula: EstadoConservacao | null;
