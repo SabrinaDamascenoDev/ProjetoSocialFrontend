@@ -32,7 +32,9 @@ export function ConteudoDetalhesPlaca({ dados }: { dados: DadosDetalhes }) {
   return <div className="plate-details-grid">
     <section className="plate-details-card" aria-label="Resumo da placa">
       <div className="plate-summary">
-        {placa.foto_url ? <img src={placa.foto_url} alt={`Placa ${placa.codigo}`} className="plate-main-photo" /> : null}
+        <div className="plate-main-photo">
+          {placa.foto_url && <img src={placa.foto_url} alt={`Placa ${placa.codigo}`} />}
+        </div>
         <div>
           <div className="plate-summary-title"><h2>Placa {placa.codigo}</h2><span className={`plate-status plate-status-${placa.estado_conservacao?.toLowerCase() ?? "unknown"}`}>{nomeEstado(placa.estado_conservacao)}</span></div>
           <p>Código {placa.codigo}</p>
@@ -76,7 +78,9 @@ export function ConteudoDetalhesPlaca({ dados }: { dados: DadosDetalhes }) {
             <p>Responsável: {registro.responsavel}</p>
           </div>
           <figure>
-            {registro.fotoUrl ? <img src={registro.fotoUrl} alt={`Foto da placa — ${registro.tipo}`} /> : null}
+            <div className="plate-event-photo">
+              {registro.fotoUrl && <img src={registro.fotoUrl} alt={`Foto da placa — ${registro.tipo}`} />}
+            </div>
             <figcaption>{registro.tipo}</figcaption>
           </figure>
         </li>)}
