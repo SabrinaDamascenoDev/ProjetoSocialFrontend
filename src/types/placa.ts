@@ -30,6 +30,7 @@ export interface PlacaResponse {
   created_at: string; 
   endereco: EnderecoResponse | null;
   ultimo_evento: UltimoEventoResponse | null;
+  descricao_contran: string | null;
 }
 
 export interface PlacasPaginadasResponse {
@@ -47,6 +48,7 @@ export interface Placa {
   substrato: EstadoConservacao | null;
   suporte: EstadoConservacao | null;
   data_registro: string;
+  descricao_contran: string | null;
 }
 
 export interface PlacasPaginadas {

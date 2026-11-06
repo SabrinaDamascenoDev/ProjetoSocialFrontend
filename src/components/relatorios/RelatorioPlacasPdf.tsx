@@ -1,61 +1,54 @@
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import type { Placa } from '../../types/placa';
 import type { FiltrosPlacas } from '../../services/placasService';
+import logoCacaPlacas from '../../assets/logo.png'; // Ajuste o caminho se necessário
 
 const cores = {
   navy: '#011025',
   orange: '#C77700',
-  light: '#F3F3F3',
-  grey: '#7A7A7A',
-  bom: { fundo: '#C8F0D0', texto: '#1B7A2F' },
-  regular: { fundo: '#FFF1B8', texto: '#9A7B00' },
-  ruim: { fundo: '#FFD0D0', texto: '#C62828' },
-  vazio: { fundo: '#EEEEEE', texto: '#555555' },
+  lightGrey: '#F3F3F3',
+  borderGrey: '#D1D5DB',
+  textGrey: '#4A5568',
 };
 
 const styles = StyleSheet.create({
-  page: { padding: 30, backgroundColor: '#FFFFFF', fontFamily: 'Helvetica', fontSize: 8 },
+  page: { padding: 40, backgroundColor: '#FFFFFF', fontFamily: 'Helvetica', fontSize: 9, color: cores.navy },
   
-  // Cabeçalho da página (Logo e Título)
-  header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20, borderBottomWidth: 2, borderBottomColor: cores.navy, paddingBottom: 10 },
-  title: { fontSize: 18, fontWeight: 'bold', color: cores.navy },
-  subtitle: { fontSize: 9, color: cores.grey, marginTop: 4 },
+  // Header
+  header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 25 },
+  logo: { width: 80, height: 'auto', objectFit: 'contain' },
+  headerRight: { textAlign: 'right', fontSize: 9, fontWeight: 'bold' },
+  headerText: { marginBottom: 4 },
   
-  // Filtros
-  resumoFiltros: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 15, padding: 8, backgroundColor: cores.light, borderRadius: 4 },
-  filtroText: { fontSize: 8, marginRight: 15, color: cores.navy },
-  filtroLabel: { fontWeight: 'bold' },
+  // Títulos das Seções
+  sectionTitle: { fontSize: 11, fontWeight: 'bold', marginTop: 15, marginBottom: 10, textTransform: 'uppercase' },
   
-  // Tabela
-  table: { width: '100%', flexDirection: 'column' },
-  tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#D1D5DB', minHeight: 28, alignItems: 'center' },
-  tableHeader: { backgroundColor: cores.navy, color: '#FFFFFF', fontWeight: 'bold', fontSize: 8, minHeight: 30 },
-  tableCell: { paddingHorizontal: 4, paddingVertical: 6, textAlign: 'center', fontSize: 8 },
-  
-  // Larguras explícitas das colunas (porcentagem da página)
-  colFoto: { width: '8%', alignItems: 'center', justifyContent: 'center' },
-  colCodigo: { width: '10%', textAlign: 'left', fontWeight: 'bold' },
-  colLocal: { width: '30%', textAlign: 'left' },
-  colEstado: { width: '10%' },
-  colData: { width: '12%' },
-  
-  // Badges de status
-  badge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10, fontSize: 7, fontWeight: 'bold', textAlign: 'center', alignSelf: 'center' },
-  
-  // Footer
-  footer: { position: 'absolute', bottom: 30, left: 30, right: 30, flexDirection: 'row', justifyContent: 'space-between', fontSize: 8, color: cores.grey, borderTopWidth: 1, borderTopColor: '#D1D5DB', paddingTop: 5 }
-});
+  // Resumo Executivo (Cards)
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
+  summaryCard: { width: '23%', borderWidth: 1, borderColor: cores.borderGrey, borderRadius: 4, padding: 8, alignItems: 'center' },
+  summaryCardTitle: { fontSize: 9, fontWeight: 'bold', marginBottom: 6, textAlign: 'center' },
+  summaryCardValue: { fontSize: 16, fontWeight: 'bold' },
+  summaryCardDesc: { fontSize: 7, color: cores.textGrey, textAlign: 'center', marginTop: 4 },
 
-function StatusBadge({ status }: { status: string | null }) {
-  const config = status === 'BOM' ? cores.bom : status === 'REGULAR' ? cores.regular : status === 'RUIM' ? cores.ruim : cores.vazio;
-  const texto = status === 'BOM' ? 'Bom' : status === 'REGULAR' ? 'Regular' : status === 'RUIM' ? 'Ruim' : '—';
-  
-  return (
-    <Text style={[styles.badge, { backgroundColor: config.fundo, color: config.texto }]}>
-      {texto}
-    </Text>
-  );
-}
+  // Tabela
+  table: { width: '100%', borderWidth: 1, borderColor: cores.borderGrey, marginBottom: 20 },
+  tableHeader: { flexDirection: 'row', backgroundColor: '#E5E7EB', borderBottomWidth: 1, borderBottomColor: cores.borderGrey, paddingVertical: 6 },
+  tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: cores.borderGrey, paddingVertical: 6 },
+  tableRowTotal: { flexDirection: 'row', backgroundColor: '#E5E7EB', paddingVertical: 6, fontWeight: 'bold' },
+  colCodigo: { width: '20%', textAlign: 'center', fontSize: 9 },
+  colNome: { width: '60%', textAlign: 'center', fontSize: 9 },
+  colQtd: { width: '20%', textAlign: 'center', fontSize: 9, fontWeight: 'bold' },
+
+  // Tipologia (Cards)
+  typologyContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 15 },
+  typologyCard: { width: '47%', borderWidth: 1, borderColor: cores.borderGrey, borderRadius: 4, padding: 10, marginBottom: 10 },
+  typologyTitle: { fontSize: 9, fontWeight: 'bold', marginBottom: 4 },
+  typologySubtitle: { fontSize: 8, color: cores.textGrey, marginBottom: 8 },
+  typologyLine: { fontSize: 8, color: cores.textGrey, marginBottom: 2 },
+
+  // Footer
+  footer: { position: 'absolute', bottom: 30, left: 40, right: 40, flexDirection: 'row', justifyContent: 'space-between', fontSize: 8, color: cores.textGrey, borderTopWidth: 1, borderTopColor: cores.borderGrey, paddingTop: 5 }
+});
 
 interface Props {
   placas: Placa[];
@@ -63,84 +56,117 @@ interface Props {
 }
 
 export function RelatorioPlacasPdf({ placas, filtros }: Props) {
-  const dataEmissao = new Date().toLocaleString('pt-BR');
-  
-  const filtrosAtivos = [];
-  if (filtros.busca) filtrosAtivos.push(`Busca: "${filtros.busca}"`);
-  if (filtros.estado !== 'todos') filtrosAtivos.push(`Estado: ${filtros.estado}`);
-  if (filtros.codigo_contran !== 'todos') filtrosAtivos.push(`Tipo: ${filtros.codigo_contran}`);
-  if (filtros.dataInicio) filtrosAtivos.push(`De: ${filtros.dataInicio}`);
-  if (filtros.dataFim) filtrosAtivos.push(`Até: ${filtros.dataFim}`);
+  // 1. Cálculos para o Resumo Executivo
+  const total = placas.length;
+  const totalBom = placas.filter(p => p.estado_conservacao === 'BOM').length;
+  const totalRegular = placas.filter(p => p.estado_conservacao === 'REGULAR').length;
+  const totalRuim = placas.filter(p => p.estado_conservacao === 'RUIM').length;
+
+  // 2. Agrupamento por Código para a Tabela e Tipologia
+  const porCodigo = placas.reduce((acc, placa) => {
+    const cod = placa.codigo;
+    if (!acc[cod]) {
+      acc[cod] = {
+        codigo: cod,
+        nome: placa.descricao_contran || cod, // Fallback se não tiver descrição
+        total: 0,
+        bom: 0,
+        regular: 0,
+        ruim: 0
+      };
+    }
+    acc[cod].total++;
+    if (placa.estado_conservacao === 'BOM') acc[cod].bom++;
+    if (placa.estado_conservacao === 'REGULAR') acc[cod].regular++;
+    if (placa.estado_conservacao === 'RUIM') acc[cod].ruim++;
+    return acc;
+  }, {} as Record<string, { codigo: string, nome: string, total: number, bom: number, regular: number, ruim: number }>);
+
+  const codigosArray = Object.values(porCodigo);
+
+  // Formata a string de endereço baseada na busca (se houver)
+  const enderecoFiltro = filtros.busca ? `Busca: ${filtros.busca}` : 'Todos os registros';
 
   return (
     <Document>
-      <Page size="A4" orientation="landscape" style={styles.page}>
+      <Page size="A4" orientation="portrait" style={styles.page}>
         
-        {/* Cabeçalho da Página */}
+        {/* Cabeçalho */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.title}>Relatório de Placas</Text>
-            <Text style={styles.subtitle}>Sistema de Sinalização de Trânsito - Quixadá</Text>
-          </View>
-          <View style={{ textAlign: 'right' }}>
-            <Text style={styles.subtitle}>Data de emissão:</Text>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: cores.navy }}>{dataEmissao}</Text>
-            <Text style={styles.subtitle}>Total de registros: {placas.length}</Text>
+          <Image src={logoCacaPlacas} style={styles.logo} />
+          <View style={styles.headerRight}>
+            <Text style={styles.headerText}>Relatório Técnico de Campo</Text>
+            <Text style={styles.headerText}>Endereço:</Text>
+            <Text style={styles.headerText}>Rua: {enderecoFiltro}</Text>
           </View>
         </View>
 
-        {/* Filtros aplicados */}
-        {filtrosAtivos.length > 0 && (
-          <View style={styles.resumoFiltros}>
-            <Text style={styles.filtroText}><Text style={styles.filtroLabel}>Filtros aplicados: </Text>{filtrosAtivos.join('  |  ')}</Text>
+        {/* 1. Resumo Executivo */}
+        <Text style={styles.sectionTitle}>1. Resumo Executivo</Text>
+        <View style={styles.summaryRow}>
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryCardTitle}>TOTAL</Text>
+            <Text style={styles.summaryCardValue}>{total}</Text>
+            <Text style={styles.summaryCardDesc}>Número selecionado nos filtros</Text>
           </View>
-        )}
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryCardTitle}>ESTADO BOM</Text>
+            <Text style={styles.summaryCardValue}>{totalBom}</Text>
+            <Text style={styles.summaryCardDesc}>Número de placas boas nos filtros</Text>
+          </View>
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryCardTitle}>ESTADO REGULAR</Text>
+            <Text style={styles.summaryCardValue}>{totalRegular}</Text>
+            <Text style={styles.summaryCardDesc}>Número de placas regulares nos filtros</Text>
+          </View>
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryCardTitle}>ESTADO RUIM</Text>
+            <Text style={styles.summaryCardValue}>{totalRuim}</Text>
+            <Text style={styles.summaryCardDesc}>Número de placas ruins nos filtros</Text>
+          </View>
+        </View>
 
-        {/* Tabela */}
+        {/* 2. Quantitativo por Código */}
+        <Text style={styles.sectionTitle}>2. Quantitativo por Código de Sinalização</Text>
         <View style={styles.table}>
-          
-          {/* O "fixed" faz o cabeçalho se repetir em todas as páginas */}
-          <View style={[styles.tableRow, styles.tableHeader]} fixed>
-            <Text style={[styles.tableCell, styles.colFoto]}>Foto</Text>
-            <Text style={[styles.tableCell, styles.colCodigo]}>Código</Text>
-            <Text style={[styles.tableCell, styles.colLocal]}>Localização</Text>
-            <Text style={[styles.tableCell, styles.colEstado]}>Conservação</Text>
-            <Text style={[styles.tableCell, styles.colEstado]}>Película</Text>
-            <Text style={[styles.tableCell, styles.colEstado]}>Substrato</Text>
-            <Text style={[styles.tableCell, styles.colEstado]}>Suporte</Text>
-            <Text style={[styles.tableCell, styles.colData]}>Data</Text>
+          <View style={styles.tableHeader}>
+            <Text style={[styles.colCodigo, { fontWeight: 'bold' }]}>CÓDIGO</Text>
+            <Text style={[styles.colNome, { fontWeight: 'bold' }]}>NOME DA SINALIZAÇÃO</Text>
+            <Text style={[styles.colQtd, { fontWeight: 'bold' }]}>QUANTIDADE</Text>
           </View>
 
-          {/* Linhas de dados */}
-          {placas.map((placa) => (
-            /* O "wrap={false}" impede que a linha seja cortada ao meio entre páginas */
-            <View key={placa.id} style={styles.tableRow} wrap={false}>
+          {codigosArray.map((item) => (
+            <View key={item.codigo} style={styles.tableRow} wrap={false}>
+              <Text style={styles.colCodigo}>{item.codigo}</Text>
+              <Text style={styles.colNome}>{item.nome}</Text>
+              <Text style={styles.colQtd}>{item.total}</Text>
+            </View>
+          ))}
+
+          <View style={styles.tableRowTotal}>
+            <Text style={[styles.colCodigo, { width: '80%', textAlign: 'right', paddingRight: 10 }]}>TOTAL GERAL DE DISPOSITIVOS</Text>
+            <Text style={styles.colQtd}>{total}</Text>
+          </View>
+        </View>
+
+        {/* 3. Tipologia dos Sinais */}
+        <Text style={styles.sectionTitle}>3. Tipologia dos Sinais Vistoriados</Text>
+        <View style={styles.typologyContainer}>
+          {codigosArray.map((item) => (
+            <View key={item.codigo} style={styles.typologyCard} wrap={false}>
+              <Text style={styles.typologyTitle}>SINAL {item.codigo} - {item.nome}</Text>
+              <Text style={styles.typologySubtitle}>Total em campo: {item.total} unidades</Text>
               
-              <View style={[styles.tableCell, styles.colFoto]}>
-                {placa.foto_url ? (
-                  <Image src={placa.foto_url} style={{ width: 32, height: 24, borderRadius: 2, objectFit: 'cover' }} />
-                ) : (
-                  <Text style={{ fontSize: 7, color: cores.grey }}>Sem foto</Text>
-                )}
-              </View>
-              
-              <Text style={[styles.tableCell, styles.colCodigo]}>{placa.codigo}</Text>
-              
-              <Text style={[styles.tableCell, styles.colLocal]}>{placa.endereco}</Text>
-              
-              <View style={[styles.tableCell, styles.colEstado]}><StatusBadge status={placa.estado_conservacao} /></View>
-              <View style={[styles.tableCell, styles.colEstado]}><StatusBadge status={placa.pelicula} /></View>
-              <View style={[styles.tableCell, styles.colEstado]}><StatusBadge status={placa.substrato} /></View>
-              <View style={[styles.tableCell, styles.colEstado]}><StatusBadge status={placa.suporte} /></View>
-              
-              <Text style={[styles.tableCell, styles.colData]}>{placa.data_registro.slice(0, 10).split('-').reverse().join('/')}</Text>
+              <Text style={styles.typologyLine}>{item.ruim} unidades em estado ruim.</Text>
+              <Text style={styles.typologyLine}>{item.regular} unidades em estado regular.</Text>
+              <Text style={styles.typologyLine}>{item.bom} unidades em estado bom.</Text>
             </View>
           ))}
         </View>
 
-        {/* Rodapé com Paginação */}
+        {/* Rodapé */}
         <View style={styles.footer} fixed>
-          <Text>Caça Placas - Relatório Gerado pelo Sistema</Text>
+          <Text>Caça Placas - Relatório Técnico</Text>
           <Text render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`} />
         </View>
 

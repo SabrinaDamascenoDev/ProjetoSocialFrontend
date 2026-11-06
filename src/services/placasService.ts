@@ -27,6 +27,7 @@ function paraPlaca(r: PlacaResponse): Placa {
   return {
     id: r.id,
     codigo: r.codigo_contran,
+    descricao_contran: r.descricao_contran,
     foto_url: evento?.foto_url ?? null,
     endereco: montarEndereco(r.endereco),
     estado_conservacao: evento?.estado_conservacao ?? null,
