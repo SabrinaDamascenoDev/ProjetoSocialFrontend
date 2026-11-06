@@ -1,7 +1,7 @@
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import type { Placa } from '../../types/placa';
 import type { FiltrosPlacas } from '../../services/placasService';
-import logoCacaPlacas from '../../assets/logo.png'; // Ajuste o caminho se necessário
+import logoCacaPlacas from '../../assets/logo.png';
 
 const cores = {
   navy: '#011025',
@@ -14,23 +14,19 @@ const cores = {
 const styles = StyleSheet.create({
   page: { padding: 40, backgroundColor: '#FFFFFF', fontFamily: 'Helvetica', fontSize: 9, color: cores.navy },
   
-  // Header
   header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 25 },
   logo: { width: 80, height: 'auto', objectFit: 'contain' },
   headerRight: { textAlign: 'right', fontSize: 9, fontWeight: 'bold' },
   headerText: { marginBottom: 4 },
   
-  // Títulos das Seções
   sectionTitle: { fontSize: 11, fontWeight: 'bold', marginTop: 15, marginBottom: 10, textTransform: 'uppercase' },
   
-  // Resumo Executivo (Cards)
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
   summaryCard: { width: '23%', borderWidth: 1, borderColor: cores.borderGrey, borderRadius: 4, padding: 8, alignItems: 'center' },
   summaryCardTitle: { fontSize: 9, fontWeight: 'bold', marginBottom: 6, textAlign: 'center' },
   summaryCardValue: { fontSize: 16, fontWeight: 'bold' },
   summaryCardDesc: { fontSize: 7, color: cores.textGrey, textAlign: 'center', marginTop: 4 },
 
-  // Tabela
   table: { width: '100%', borderWidth: 1, borderColor: cores.borderGrey, marginBottom: 20 },
   tableHeader: { flexDirection: 'row', backgroundColor: '#E5E7EB', borderBottomWidth: 1, borderBottomColor: cores.borderGrey, paddingVertical: 6 },
   tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: cores.borderGrey, paddingVertical: 6 },
@@ -39,14 +35,12 @@ const styles = StyleSheet.create({
   colNome: { width: '60%', textAlign: 'center', fontSize: 9 },
   colQtd: { width: '20%', textAlign: 'center', fontSize: 9, fontWeight: 'bold' },
 
-  // Tipologia (Cards)
   typologyContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 15 },
   typologyCard: { width: '47%', borderWidth: 1, borderColor: cores.borderGrey, borderRadius: 4, padding: 10, marginBottom: 10 },
   typologyTitle: { fontSize: 9, fontWeight: 'bold', marginBottom: 4 },
   typologySubtitle: { fontSize: 8, color: cores.textGrey, marginBottom: 8 },
   typologyLine: { fontSize: 8, color: cores.textGrey, marginBottom: 2 },
 
-  // Footer
   footer: { position: 'absolute', bottom: 30, left: 40, right: 40, flexDirection: 'row', justifyContent: 'space-between', fontSize: 8, color: cores.textGrey, borderTopWidth: 1, borderTopColor: cores.borderGrey, paddingTop: 5 }
 });
 
@@ -56,19 +50,17 @@ interface Props {
 }
 
 export function RelatorioPlacasPdf({ placas, filtros }: Props) {
-  // 1. Cálculos para o Resumo Executivo
   const total = placas.length;
   const totalBom = placas.filter(p => p.estado_conservacao === 'BOM').length;
   const totalRegular = placas.filter(p => p.estado_conservacao === 'REGULAR').length;
   const totalRuim = placas.filter(p => p.estado_conservacao === 'RUIM').length;
 
-  // 2. Agrupamento por Código para a Tabela e Tipologia
   const porCodigo = placas.reduce((acc, placa) => {
     const cod = placa.codigo;
     if (!acc[cod]) {
       acc[cod] = {
         codigo: cod,
-        nome: placa.descricao_contran || cod, // Fallback se não tiver descrição
+        nome: placa.descricao_contran || cod,
         total: 0,
         bom: 0,
         regular: 0,
@@ -84,7 +76,6 @@ export function RelatorioPlacasPdf({ placas, filtros }: Props) {
 
   const codigosArray = Object.values(porCodigo);
 
-  // Formata a string de endereço baseada na busca (se houver)
   const enderecoFiltro = filtros.busca ? `Busca: ${filtros.busca}` : 'Todos os registros';
 
   return (
