@@ -66,3 +66,8 @@ export interface ListarPlacasParams {
   data_inicio?: string;
   data_fim?: string;
 }
+
+export interface Tipos {
+  codigo: string;
+  descricao: string;
+}
