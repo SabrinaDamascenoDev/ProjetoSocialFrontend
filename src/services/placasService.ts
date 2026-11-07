@@ -27,6 +27,7 @@ function paraPlaca(r: PlacaResponse): Placa {
   return {
     id: r.id,
     codigo: r.codigo_contran,
+    descricao_contran: r.descricao_contran,
     foto_url: evento?.foto_url ?? null,
     endereco: montarEndereco(r.endereco),
     estado_conservacao: evento?.estado_conservacao ?? null,
@@ -85,5 +86,25 @@ export const placasService = {
 
     const resposta = await placasRepository.listar(params);
     return { items: resposta.items.map(paraPlaca), total: resposta.total };
+  },
+  async listarParaRelatorio(filtros: FiltrosPlacas): Promise<Placa[]> {
+    let pagina = 1;
+    const itensPorPagina = 100; // Tamanho seguro para requisições
+    const todasAsPlacas: Placa[] = [];
+
+    while (true) {
+      const resposta = await this.listar(pagina, itensPorPagina, filtros);
+      
+      todasAsPlacas.push(...resposta.items);
+      
+      // Se já pegamos tudo ou a página voltou vazia, paramos
+      if (todasAsPlacas.length >= resposta.total || resposta.items.length === 0) {
+        break;
+      }
+      
+      pagina += 1;
+    }
+
+    return todasAsPlacas;
   },
 };

@@ -28,10 +28,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
+import { toast } from 'sonner';
+import { toastOptions } from '../../lib/toastOptions';
 
 import { placasService } from '../../services/placasService';
 import type { FiltrosPlacas } from '../../services/placasService';
 import type { EstadoConservacao, Placa } from '../../types/placa';
+import { gerarBaixarRelatorioPlacas } from '../../utils/gerarPdf';
 
 const ITENS_POR_PAGINA = 8;
 
@@ -96,6 +99,7 @@ export function Placas() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [tentativa, setTentativa] = useState(0);
+  const [gerandoPdf, setGerandoPdf] = useState(false);
 
   const [pagina, setPagina] = useState(1);
   const [filtros, setFiltros] = useState<FiltrosPlacas>(FILTROS_INICIAIS);
@@ -180,8 +184,33 @@ export function Placas() {
     navigate(`/placas/${placa.id}/editar`); 
   }
 
-  function handleGerarRelatorio() {
-    // TODO: gerar PDF com os dados da listagem (outra task)
+  async function handleGerarRelatorio() {
+    try {
+      setGerandoPdf(true);
+      
+      const placasFiltradas = await placasService.listarParaRelatorio({
+        ...filtros,
+        busca: buscaDebounced,
+      });
+
+      if (placasFiltradas.length === 0) {
+        toast.error('Nenhuma placa encontrada com os filtros atuais.', toastOptions);
+        return;
+      }
+
+      // Gera e faz o download
+      await gerarBaixarRelatorioPlacas(placasFiltradas, {
+        ...filtros,
+        busca: buscaDebounced,
+      });
+      
+      toast.success('Relatório gerado com sucesso!', toastOptions);
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast.error('Não foi possível gerar o relatório. Tente novamente.', toastOptions);
+    } finally {
+      setGerandoPdf(false);
+    }
   }
 
   function handleExcluir(e: MouseEvent, _placa: Placa) {
@@ -272,11 +301,16 @@ export function Placas() {
 
           <Button
             color="secondary"
-            startIcon={<DescriptionIcon />}
+            startIcon={
+              gerandoPdf 
+                ? <CircularProgress size={20} color="inherit" /> 
+                : <DescriptionIcon />
+            }
             onClick={handleGerarRelatorio}
+            disabled={gerandoPdf || loading}
             sx={{ height: 48 }}
           >
-            Gerar relatório
+            {gerandoPdf ? 'Gerando...' : 'Gerar relatório'}
           </Button>
         </Box>
       </Paper>
