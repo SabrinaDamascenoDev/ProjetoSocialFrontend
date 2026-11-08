@@ -39,6 +39,7 @@ import type { Placa } from '../../types/placa';
 import type { Tipos } from '../../types/placa';
 import { gerarBaixarRelatorioPlacas } from '../../utils/gerarPdf';
 import { coresDoEstado } from '../../utils/coresEstadoConservacao';
+import { EditPlateDialog } from '../../components/EditPlateDialog';
 
 const ITENS_POR_PAGINA = 8;
 
@@ -84,6 +85,7 @@ export function Placas() {
   const [erro, setErro] = useState<string | null>(null);
   const [tentativa, setTentativa] = useState(0);
   const [gerandoPdf, setGerandoPdf] = useState(false);
+  const [placaEmEdicao, setPlacaEmEdicao] = useState<Placa | null>(null);
 
   const [tiposPlaca, setTiposPlaca] = useState<Tipos[]>([]);
   const [estadosConservacao, setEstadosConservacao] = useState<Tipos[]>([]);
@@ -152,6 +154,8 @@ export function Placas() {
         if (ativo) {
           setPlacas(resultado.items);
           setTotal(resultado.total);
+          const ultimaPagina = Math.max(1, Math.ceil(resultado.total / ITENS_POR_PAGINA));
+          if (pagina > ultimaPagina) setPagina(ultimaPagina);
         }
 
       } catch {
@@ -203,7 +207,7 @@ export function Placas() {
 
   function handleEditar(e: MouseEvent, placa: Placa) {
     e.stopPropagation();
-    navigate(`/placas/${placa.id}/editar`);
+    setPlacaEmEdicao(placa);
   }
 
   async function handleGerarRelatorio() {
@@ -242,6 +246,12 @@ export function Placas() {
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, width: '100%' }}>
+      {placaEmEdicao && <EditPlateDialog key={placaEmEdicao.id} placa={placaEmEdicao} codigos={tiposPlaca}
+        onClose={() => setPlacaEmEdicao(null)} onSaved={atualizada => {
+          setPlacas(atuais => atuais.map(item => item.id === atualizada.id ? atualizada : item));
+          setPlacaEmEdicao(null);
+          setTentativa(valor => valor + 1);
+        }} />}
       <Box sx={{ mb: 3 }}>
         <Typography component="h1" variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
           Placas de Sinalização
