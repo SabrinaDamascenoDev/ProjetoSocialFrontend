@@ -249,7 +249,6 @@ export function Placas() {
       {placaEmEdicao && <EditPlateDialog key={placaEmEdicao.id} placa={placaEmEdicao} codigos={tiposPlaca}
         onClose={() => setPlacaEmEdicao(null)} onSaved={atualizada => {
           setPlacas(atuais => atuais.map(item => item.id === atualizada.id ? atualizada : item));
-          setPlacaEmEdicao(null);
           setTentativa(valor => valor + 1);
         }} />}
       <Box sx={{ mb: 3 }}>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Alert, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from '@mui/material';
+import { Alert, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, TextField } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 import PhotoCameraOutlinedIcon from '@mui/icons-material/PhotoCameraOutlined';
 import { toast } from 'sonner';
 import { toastOptions } from '../lib/toastOptions';
@@ -22,6 +23,7 @@ export function EditPlateDialog({ placa, codigos, onClose, onSaved }: Props) {
   const [erroFoto, setErroFoto] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [saved, setSaved] = useState(false);
   const pending = useRef(false);
   const upload = useRef<HTMLInputElement>(null);
 
@@ -38,7 +40,7 @@ export function EditPlateDialog({ placa, codigos, onClose, onSaved }: Props) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending.current) return;
+    if (pending.current || saved) return;
     const invalidos = validarEdicaoPlaca(placa, dados);
     setErrors(invalidos);
     if (Object.keys(invalidos).length || erroFoto) return;
@@ -47,7 +49,7 @@ export function EditPlateDialog({ placa, codigos, onClose, onSaved }: Props) {
     setErro(null);
     try {
       const atualizada = await placasService.editar(placa, dados, foto);
-      toast.success('Dados da placa atualizados com sucesso!', toastOptions);
+      setSaved(true);
       onSaved(atualizada);
     } catch {
       setErro('Erro ao atualizar os dados da placa.');
@@ -67,6 +69,38 @@ export function EditPlateDialog({ placa, codigos, onClose, onSaved }: Props) {
       {opcoes && Object.entries(opcoes).map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
     </TextField>;
   }
+
+  if (saved) return (
+    <Dialog open onClose={onClose} fullWidth maxWidth={false}
+      aria-labelledby="edit-plate-success-title" aria-describedby="edit-plate-success-description"
+      slotProps={{ backdrop: { sx: { bgcolor: 'rgba(1, 16, 37, .50)' } }, paper: { sx: {
+        bgcolor: '#cdffc5', borderRadius: { xs: '24px', sm: '38px' }, width: 476,
+        minHeight: 374, m: 2, maxWidth: 'calc(100% - 32px)',
+      } } }}>
+      <DialogContent sx={{ textAlign: 'center', px: { xs: 2, sm: 2.5 }, pt: 6.5, pb: 5 }}>
+        <Box aria-hidden="true" sx={{ width: 72, height: 72, mx: 'auto', mb: 1.5,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '10px', border: '8px solid #b4e5a8', bgcolor: '#e2efde',
+          boxShadow: 'inset 0 2px 7px rgba(54, 104, 36, .20)',
+        }}>
+          <CheckIcon sx={{ fontSize: 48, color: '#289b0c' }} />
+        </Box>
+        <DialogTitle id="edit-plate-success-title" sx={{ p: 0, mb: 1, color: '#011025',
+          fontWeight: 700, fontSize: { xs: 22, sm: 26 }, lineHeight: 1.2 }}>
+          Alterações salvas com sucesso!
+        </DialogTitle>
+        <DialogContentText id="edit-plate-success-description" sx={{ color: '#718078',
+          fontSize: { xs: 15, sm: 18 }, lineHeight: 1.2, maxWidth: 390, mx: 'auto', mb: 2.5 }}>
+          Retorne à tela das placas de sinalização para visualizar suas alterações.
+        </DialogContentText>
+        <Button autoFocus onClick={onClose} color="secondary" sx={{ minWidth: 92,
+          height: 32, minHeight: 32, fontSize: 12, color: '#011025', borderRadius: '5px',
+          border: '1px solid #a96600' }}>
+          Retornar
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
 
   return (
     <Dialog open onClose={close} fullWidth maxWidth={false} aria-labelledby="edit-plate-title"
