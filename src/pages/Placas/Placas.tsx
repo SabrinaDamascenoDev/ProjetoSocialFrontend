@@ -40,6 +40,7 @@ import type { Tipos } from '../../types/placa';
 import { gerarBaixarRelatorioPlacas } from '../../utils/gerarPdf';
 import { coresDoEstado } from '../../utils/coresEstadoConservacao';
 import { EditPlateDialog } from '../../components/EditPlateDialog';
+import { DeletePlateDialog } from '../../components/DeletePlateDialog';
 
 const ITENS_POR_PAGINA = 8;
 
@@ -86,6 +87,7 @@ export function Placas() {
   const [tentativa, setTentativa] = useState(0);
   const [gerandoPdf, setGerandoPdf] = useState(false);
   const [placaEmEdicao, setPlacaEmEdicao] = useState<Placa | null>(null);
+  const [placaEmExclusao, setPlacaEmExclusao] = useState<Placa | null>(null);
 
   const [tiposPlaca, setTiposPlaca] = useState<Tipos[]>([]);
   const [estadosConservacao, setEstadosConservacao] = useState<Tipos[]>([]);
@@ -239,13 +241,24 @@ export function Placas() {
     }
   }
 
-  function handleExcluir(e: MouseEvent, _placa: Placa) {
+  function handleExcluir(e: MouseEvent, placa: Placa) {
     e.stopPropagation();
-    // TODO: abrir dialog de confirmação de exclusão (outra task)
+    setPlacaEmExclusao(placa);
   }
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, width: '100%' }}>
+      {placaEmExclusao && <DeletePlateDialog key={placaEmExclusao.id} placa={placaEmExclusao}
+        onClose={() => setPlacaEmExclusao(null)} onDeleted={() => {
+          setPlacas(atuais => atuais.filter(item => item.id !== placaEmExclusao.id));
+          setSelecionadas(atuais => {
+            const novas = new Set(atuais);
+            novas.delete(placaEmExclusao.id);
+            return novas;
+          });
+          setTotal(atual => Math.max(0, atual - 1));
+          setTentativa(valor => valor + 1);
+        }} />}
       {placaEmEdicao && <EditPlateDialog key={placaEmEdicao.id} placa={placaEmEdicao} codigos={tiposPlaca}
         onClose={() => setPlacaEmEdicao(null)} onSaved={atualizada => {
           setPlacas(atuais => atuais.map(item => item.id === atualizada.id ? atualizada : item));
