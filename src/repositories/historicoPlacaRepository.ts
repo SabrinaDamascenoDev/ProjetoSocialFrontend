@@ -1,5 +1,5 @@
 import { api } from '../lib/axios';
-import type { EventoPlacaListResponse } from '../types/historico';
+import type { EventoPlacaListResponse, EventoPlacaResponse  } from '../types/historico';
 
 export const historicoRepository = {
   async listarHistorico(placaId: string, page: number, pageSize: number): Promise<EventoPlacaListResponse> {
@@ -8,4 +8,10 @@ export const historicoRepository = {
     });
     return response.data;
   },
+   async atualizarEvento(placaId: string, eventoId: string, dados: FormData): Promise<EventoPlacaResponse> {
+    const response = await api.patch<EventoPlacaResponse>(`/placas/${placaId}/eventos/${eventoId}`, dados, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  }
 };
