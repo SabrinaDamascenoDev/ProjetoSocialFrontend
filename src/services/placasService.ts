@@ -26,6 +26,7 @@ function paraPlaca(r: PlacaResponse): Placa {
 
   return {
     id: r.id,
+     evento_id: evento?.id ?? null,
     codigo: r.codigo_contran,
     descricao_contran: r.descricao_contran,
     foto_url: evento?.foto_url ?? null,
@@ -107,4 +108,8 @@ export const placasService = {
 
     return todasAsPlacas;
   },
+
+   async atualizarEvento(placaId: string, eventoId: string, dados: FormData) {
+    return placasRepository.atualizarEvento(placaId, eventoId, dados);
+  }
 };

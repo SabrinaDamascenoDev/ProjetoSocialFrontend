@@ -35,6 +35,8 @@ import { placasService } from '../../services/placasService';
 import type { FiltrosPlacas } from '../../services/placasService';
 import type { EstadoConservacao, Placa } from '../../types/placa';
 import { gerarBaixarRelatorioPlacas } from '../../utils/gerarPdf';
+import { ModalEditarRelatorio } from '../../components/ModalEditarRelatorio';
+import { ModalSucessoEdicao } from '../../components/ModalSucessoEdicao';
 
 const ITENS_POR_PAGINA = 8;
 
@@ -105,6 +107,10 @@ export function Placas() {
   const [filtros, setFiltros] = useState<FiltrosPlacas>(FILTROS_INICIAIS);
   const [buscaDebounced, setBuscaDebounced] = useState('');
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
+
+  const [modalAberto, setModalAberto] = useState(false);
+  const [placaEditando, setPlacaEditando] = useState<Placa | null>(null);
+  const [sucessoAberto, setSucessoAberto] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -181,7 +187,8 @@ export function Placas() {
 
   function handleEditar(e: MouseEvent, placa: Placa) {
     e.stopPropagation();
-    navigate(`/placas/${placa.id}/editar`); 
+    setPlacaEditando(placa);
+    setModalAberto(true);
   }
 
   async function handleGerarRelatorio() {
@@ -486,6 +493,22 @@ export function Placas() {
           />
         )}
       </Box>
+
+      <ModalEditarRelatorio
+        open={modalAberto}
+        onClose={() => setModalAberto(false)}
+        placa={placaEditando}
+        onSuccess={() => {
+          setModalAberto(false); // Fecha o modal de edição
+          setSucessoAberto(true); // Abre o modal de sucesso
+          setTentativa(prev => prev + 1); // Recarrega a tabela
+        }} 
+      />
+
+      <ModalSucessoEdicao
+        open={sucessoAberto}
+        onClose={() => setSucessoAberto(false)}
+      />
     </Box>
   );
 }
