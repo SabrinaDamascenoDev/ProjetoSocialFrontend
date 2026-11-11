@@ -6,12 +6,4 @@ export const placasRepository = {
     const response = await api.get<PlacasPaginadasResponse>('/placas/', { params });
     return response.data;
   },
-  async atualizarEvento(placaId: string, eventoId: string, dados: FormData) {
-  const response = await api.patch(
-    `/placas/${placaId}/eventos/${eventoId}`, 
-    dados,
-    { headers: { 'Content-Type': 'multipart/form-data' } }
-  );
-  return response.data;
-}
 };

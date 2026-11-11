@@ -40,7 +40,6 @@ export interface PlacasPaginadasResponse {
 
 export interface Placa {
   id: string; 
-  evento_id: string | null;
   codigo: string;
   foto_url: string | null;
   endereco: string;
