@@ -1,5 +1,6 @@
 import type { DetalhesPlaca } from '../types/detalhesPlaca';
 import { placasRepository } from '../repositories/placasRespository';
+import { prepararEdicaoPlaca, type EdicaoPlaca } from '../utils/edicaoPlaca';
 import type {
   EstadoConservacao,
   ListarPlacasParams,
@@ -18,13 +19,20 @@ export interface FiltrosPlacas {
 
 function montarEndereco(endereco: PlacaResponse['endereco']): string {
   if (!endereco) return 'Endereço não informado';
-  return `${endereco.logradouro} - ${endereco.bairro}`;
+  return [endereco.logradouro, endereco.bairro].filter(Boolean).join(' - ') || 'Endereço não informado';
 }
 
 function paraPlaca(r: PlacaResponse): Placa {
   const evento = r.ultimo_evento;
 
   return {
+    cadastro: {
+      endereco: r.endereco,
+      tipo_pelicula: r.tipo_pelicula,
+      tipo_substrato: r.tipo_substrato,
+      tipo_suporte: r.tipo_suporte,
+      afastamento: r.afastamento,
+    },
     id: r.id,
     codigo: r.codigo_contran,
     descricao_contran: r.descricao_contran,
@@ -39,6 +47,13 @@ function paraPlaca(r: PlacaResponse): Placa {
 }
 
 export const placasService = {
+  async excluir(id: string): Promise<void> {
+    await placasRepository.excluir(id);
+  },
+  async editar(placa: Placa, dados: EdicaoPlaca, foto: File | null): Promise<Placa> {
+    const atualizado = await placasRepository.editar(placa.id, prepararEdicaoPlaca(placa, dados, foto));
+    return paraPlaca(atualizado);
+  },
   async obterDetalhes(id: string): Promise<DetalhesPlaca | null> {
     let pagina = 1;
     let consultadas = 0;

@@ -1,0 +1,61 @@
+.historico-modal-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 650px;
+  max-height: 85vh;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  overflow: hidden;
+}
+.historico-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eaeaea;
+}
+.historico-modal-title-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.historico-modal-title-wrapper h2 {
+  font-size: 1.15rem;
+  margin: 0;
+  color: #1a1a1a;
+}
+.historico-modal-title-wrapper p {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 2px 0 0 0;
+}
+.historico-modal-content {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+.historico-loading, .historico-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 12px;
+  color: #666;
+}
+.historico-modal-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid #eaeaea;
+  background-color: #fafafa;
+}

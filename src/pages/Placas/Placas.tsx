@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -33,36 +33,16 @@ import { toastOptions } from '../../lib/toastOptions';
 
 import { placasService } from '../../services/placasService';
 import type { FiltrosPlacas } from '../../services/placasService';
-import type { EstadoConservacao, Placa } from '../../types/placa';
+import { tiposPlacaService } from '../../services/tiposPlacasService';
+import { estadosConservacaoService } from '../../services/estadosConservacaoService';
+import type { Placa } from '../../types/placa';
+import type { Tipos } from '../../types/placa';
 import { gerarBaixarRelatorioPlacas } from '../../utils/gerarPdf';
+import { coresDoEstado } from '../../utils/coresEstadoConservacao';
+import { EditPlateDialog } from '../../components/EditPlateDialog';
+import { DeletePlateDialog } from '../../components/DeletePlateDialog';
 
 const ITENS_POR_PAGINA = 8;
-
-const TIPOS_PLACA = [
-  'R-1', 'R-2', 'R-3', 'R-4a', 'R-4b',
-  'R-5a', 'R-5b', 'R-6a', 'R-6b', 'R-6c',
-  'R-7', 'R-8a', 'R-8b', 'R-9', 'R-10',
-  'R-11', 'R-12', 'R-13', 'R-14', 'R-15',
-  'R-16', 'R-17', 'R-18', 'R-19', 'R-20',
-  'R-21', 'R-22', 'R-23', 'R-24a', 'R-24b',
-  'R-25a', 'R-25b', 'R-25c', 'R-25d', 'R-26',
-  'R-27', 'R-28', 'R-29', 'R-30', 'R-31',
-  'R-32', 'R-33', 'R-34', 'R-35a', 'R-35b',
-  'R-36a', 'R-36b', 'R-37', 'R-38', 'R-39',
-  'R-40',
-
-  'A-1a', 'A-1b', 'A-2a', 'A-2b',
-  'A-14', 'A-18', 'A-24', 'A-32a', 'A-32b',
-  'A-33a', 'A-33b',
-
-  'OUTRO',
-];
-
-const ESTADOS: { valor: EstadoConservacao; rotulo: string; fundo: string; texto: string }[] = [
-  { valor: 'BOM', rotulo: 'Bom', fundo: '#C8F0D0', texto: '#1B7A2F' },
-  { valor: 'REGULAR', rotulo: 'Regular', fundo: '#FFF1B8', texto: '#9A7B00' },
-  { valor: 'RUIM', rotulo: 'Ruim', fundo: '#FFD0D0', texto: '#C62828' },
-];
 
 const FILTROS_INICIAIS: FiltrosPlacas = {
   busca: '',
@@ -77,16 +57,22 @@ function formatarData(iso: string) {
   return `${dia}/${mes}/${ano}`;
 }
 
-function ChipEstado({ estado }: { estado: EstadoConservacao | null }) {
+function ChipEstado({
+  estado,
+  descricoes,
+}: {
+  estado: string | null;
+  descricoes: Record<string, string>;
+}) {
   if (!estado) return <Typography color="text.secondary">—</Typography>;
 
-  const config = ESTADOS.find((e) => e.valor === estado) ?? ESTADOS[1];
+  const cores = coresDoEstado(estado);
 
   return (
     <Chip
       size="small"
-      label={config.rotulo}
-      sx={{ bgcolor: config.fundo, color: config.texto, fontWeight: 600 }}
+      label={descricoes[estado] ?? estado}
+      sx={{ bgcolor: cores.fundo, color: cores.texto, fontWeight: 600 }}
     />
   );
 }
@@ -100,11 +86,21 @@ export function Placas() {
   const [erro, setErro] = useState<string | null>(null);
   const [tentativa, setTentativa] = useState(0);
   const [gerandoPdf, setGerandoPdf] = useState(false);
+  const [placaEmEdicao, setPlacaEmEdicao] = useState<Placa | null>(null);
+  const [placaEmExclusao, setPlacaEmExclusao] = useState<Placa | null>(null);
+
+  const [tiposPlaca, setTiposPlaca] = useState<Tipos[]>([]);
+  const [estadosConservacao, setEstadosConservacao] = useState<Tipos[]>([]);
 
   const [pagina, setPagina] = useState(1);
   const [filtros, setFiltros] = useState<FiltrosPlacas>(FILTROS_INICIAIS);
   const [buscaDebounced, setBuscaDebounced] = useState('');
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
+
+  const descricoesEstado = useMemo(
+    () => Object.fromEntries(estadosConservacao.map((e) => [e.codigo, e.descricao])),
+    [estadosConservacao],
+  );
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -113,6 +109,36 @@ export function Placas() {
     }, 400);
     return () => clearTimeout(t);
   }, [filtros.busca]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    tiposPlacaService
+      .listar()
+      .then((tipos) => {
+        if (ativo) setTiposPlaca(tipos);
+      })
+      .catch(() => {
+        if (ativo) {
+          toast.error('Não foi possível carregar os tipos de placa.', toastOptions);
+        }
+      });
+
+    estadosConservacaoService
+      .listar()
+      .then((estados) => {
+        if (ativo) setEstadosConservacao(estados);
+      })
+      .catch(() => {
+        if (ativo) {
+          toast.error('Não foi possível carregar os estados de conservação.', toastOptions);
+        }
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   useEffect(() => {
     let ativo = true;
@@ -130,6 +156,8 @@ export function Placas() {
         if (ativo) {
           setPlacas(resultado.items);
           setTotal(resultado.total);
+          const ultimaPagina = Math.max(1, Math.ceil(resultado.total / ITENS_POR_PAGINA));
+          if (pagina > ultimaPagina) setPagina(ultimaPagina);
         }
 
       } catch {
@@ -181,13 +209,13 @@ export function Placas() {
 
   function handleEditar(e: MouseEvent, placa: Placa) {
     e.stopPropagation();
-    navigate(`/placas/${placa.id}/editar`); 
+    setPlacaEmEdicao(placa);
   }
 
   async function handleGerarRelatorio() {
     try {
       setGerandoPdf(true);
-      
+
       const placasFiltradas = await placasService.listarParaRelatorio({
         ...filtros,
         busca: buscaDebounced,
@@ -203,7 +231,7 @@ export function Placas() {
         ...filtros,
         busca: buscaDebounced,
       });
-      
+
       toast.success('Relatório gerado com sucesso!', toastOptions);
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
@@ -213,13 +241,30 @@ export function Placas() {
     }
   }
 
-  function handleExcluir(e: MouseEvent, _placa: Placa) {
+  function handleExcluir(e: MouseEvent, placa: Placa) {
     e.stopPropagation();
-    // TODO: abrir dialog de confirmação de exclusão (outra task)
+    setPlacaEmExclusao(placa);
   }
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, width: '100%' }}>
+      {placaEmExclusao && <DeletePlateDialog key={placaEmExclusao.id} placa={placaEmExclusao}
+        onClose={() => setPlacaEmExclusao(null)} onDeleted={() => {
+          setPlacas(atuais => atuais.filter(item => item.id !== placaEmExclusao.id));
+          setSelecionadas(atuais => {
+            const novas = new Set(atuais);
+            novas.delete(placaEmExclusao.id);
+            return novas;
+          });
+          setTotal(atual => Math.max(0, atual - 1));
+          setTentativa(valor => valor + 1);
+        }} />}
+      {placaEmEdicao && <EditPlateDialog key={placaEmEdicao.id} placa={placaEmEdicao} codigos={tiposPlaca}
+        onClose={() => setPlacaEmEdicao(null)} onSaved={atualizada => {
+          setPlacas(atuais => atuais.map(item => item.id === atualizada.id ? atualizada : item));
+          setPlacaEmEdicao(null);
+          setTentativa(valor => valor + 1);
+        }} />}
       <Box sx={{ mb: 3 }}>
         <Typography component="h1" variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
           Placas de Sinalização
@@ -276,9 +321,9 @@ export function Placas() {
             sx={{ width: 220 }}
           >
             <MenuItem value="todos">Todos</MenuItem>
-            {ESTADOS.map((e) => (
-              <MenuItem key={e.valor} value={e.valor}>
-                {e.rotulo}
+            {estadosConservacao.map((e) => (
+              <MenuItem key={e.codigo} value={e.codigo}>
+                {e.descricao}
               </MenuItem>
             ))}
           </TextField>
@@ -290,11 +335,17 @@ export function Placas() {
             value={filtros.codigo_contran}
             onChange={(e) => alterarFiltro('codigo_contran', e.target.value)}
             sx={{ width: 180 }}
+            slotProps={{
+              select: {
+                renderValue: (v) => (v === 'todos' ? 'Todos' : String(v)),
+                MenuProps: { slotProps: { paper: { sx: { maxHeight: 360 } } } },
+              },
+            }}
           >
             <MenuItem value="todos">Todos</MenuItem>
-            {TIPOS_PLACA.map((t) => (
-              <MenuItem key={t} value={t}>
-                {t}
+            {tiposPlaca.map((t) => (
+              <MenuItem key={t.codigo} value={t.codigo}>
+                {t.codigo} - {t.descricao}
               </MenuItem>
             ))}
           </TextField>
@@ -302,8 +353,8 @@ export function Placas() {
           <Button
             color="secondary"
             startIcon={
-              gerandoPdf 
-                ? <CircularProgress size={20} color="inherit" /> 
+              gerandoPdf
+                ? <CircularProgress size={20} color="inherit" />
                 : <DescriptionIcon />
             }
             onClick={handleGerarRelatorio}
@@ -315,7 +366,6 @@ export function Placas() {
         </Box>
       </Paper>
 
-      {/* Tabela */}
       <Paper elevation={0} sx={{ bgcolor: '#FFFFFF', borderRadius: 3, overflow: 'hidden' }}>
         {loading ? (
           <Box
@@ -413,17 +463,17 @@ export function Placas() {
                       </TableCell>
 
                       <TableCell>
-                        <ChipEstado estado={placa.estado_conservacao} />
+                        <ChipEstado estado={placa.estado_conservacao} descricoes={descricoesEstado} />
                       </TableCell>
 
                       <TableCell align="center">
-                        <ChipEstado estado={placa.pelicula} />
+                        <ChipEstado estado={placa.pelicula} descricoes={descricoesEstado} />
                       </TableCell>
                       <TableCell align="center">
-                        <ChipEstado estado={placa.substrato} />
+                        <ChipEstado estado={placa.substrato} descricoes={descricoesEstado} />
                       </TableCell>
                       <TableCell align="center">
-                        <ChipEstado estado={placa.suporte} />
+                        <ChipEstado estado={placa.suporte} descricoes={descricoesEstado} />
                       </TableCell>
 
                       <TableCell>{formatarData(placa.data_registro)}</TableCell>

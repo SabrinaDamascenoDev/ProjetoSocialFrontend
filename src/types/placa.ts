@@ -1,9 +1,9 @@
 export type EstadoConservacao = 'BOM' | 'REGULAR' | 'RUIM';
 
 export interface EnderecoResponse {
-  logradouro: string;
-  bairro: string;
-  cep: string;
+  logradouro: string | null;
+  bairro: string | null;
+  cep: string | null;
   referencia: string | null;
 }
 
@@ -39,6 +39,7 @@ export interface PlacasPaginadasResponse {
 }
 
 export interface Placa {
+  cadastro: Pick<PlacaResponse, 'endereco' | 'tipo_pelicula' | 'tipo_substrato' | 'tipo_suporte' | 'afastamento'>;
   id: string; 
   codigo: string;
   foto_url: string | null;
@@ -65,4 +66,9 @@ export interface ListarPlacasParams {
   codigo_contran?: string;
   data_inicio?: string;
   data_fim?: string;
+}
+
+export interface Tipos {
+  codigo: string;
+  descricao: string;
 }
