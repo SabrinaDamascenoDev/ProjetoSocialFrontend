@@ -1,37 +1,37 @@
 import { useEffect, useState } from 'react';
 import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  IconButton, 
-  CircularProgress, 
-  Pagination, 
-  Box, 
-  Typography 
+  Dialog, DialogTitle, DialogContent, IconButton, 
+  CircularProgress, Pagination, Box, Typography 
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import HistoryIcon from '@mui/icons-material/History';
 import { historicoService } from '../services/historicoPlacaService';
 import type { EventoPlacaResponse } from '../types/historico';
 import { DetalhesVistoriaDialog } from './DetalheVistoriaDialog';
+import { EditRelatorioDialog } from './EditRelatorioDialog';
 import './HistoricoDialog.css';
 
 interface HistoricoDialogProps {
   placaId: string;
   open: boolean;
   onClose: () => void;
+  enderecoPlaca?: string;
 }
 
 function dataFormatada(data: string) {
   return data.slice(0, 10).split('-').reverse().join('/');
 }
 
-export function HistoricoDialog({ placaId, open, onClose }: HistoricoDialogProps) {
+export function HistoricoDialog({ placaId, open, onClose, enderecoPlaca = 'Endereço não informado' }: HistoricoDialogProps) {
   const [loading, setLoading] = useState(false);
   const [itens, setItens] = useState<EventoPlacaResponse[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [eventoSelecionado, setEventoSelecionado] = useState<EventoPlacaResponse | null>(null);
+  
+  const [modalEdicaoAberto, setModalEdicaoAberto] = useState(false);
+  const [eventoEditando, setEventoEditando] = useState<EventoPlacaResponse | null>(null);
+  
   const pageSize = 5;
 
   useEffect(() => {
@@ -59,13 +59,7 @@ export function HistoricoDialog({ placaId, open, onClose }: HistoricoDialogProps
 
   return (
     <>
-      <Dialog 
-        open={open} 
-        onClose={onClose} 
-        maxWidth="sm" 
-        fullWidth
-        aria-labelledby="modal-historico-titulo"
-      >
+      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="modal-historico-titulo">
         <DialogTitle className="historico-modal-header">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <HistoryIcon color="action" />
@@ -96,11 +90,7 @@ export function HistoricoDialog({ placaId, open, onClose }: HistoricoDialogProps
           ) : (
             <ol className="plate-timeline">
               {itens.map((evento) => (
-                <li 
-                  key={evento.id} 
-                  onClick={() => setEventoSelecionado(evento)} 
-                  style={{ cursor: 'pointer' }}
-                >
+                <li key={evento.id} onClick={() => setEventoSelecionado(evento)} style={{ cursor: 'pointer' }}>
                   <div className="plate-event-text">
                     <time dateTime={evento.timestamp}>{dataFormatada(evento.timestamp)}</time>
                     <p>
@@ -142,12 +132,24 @@ export function HistoricoDialog({ placaId, open, onClose }: HistoricoDialogProps
         onClose={() => setEventoSelecionado(null)}
         evento={eventoSelecionado}
         onEditar={(ev) => {
-          console.log('Editar evento:', ev.id);
-          // Adicione a lógica de edição aqui
+          setEventoSelecionado(null); // Fecha os detalhes
+          setEventoEditando(ev);      // Guarda o evento
+          setModalEdicaoAberto(true); // Abre o seu novo modal de edição
         }}
         onExcluir={(ev) => {
           console.log('Excluir evento:', ev.id);
-          // Adicione a lógica de exclusão aqui
+        }}
+      />
+
+      {/* O SEU NOVO MODAL DE EDIÇÃO */}
+      <EditRelatorioDialog
+        open={modalEdicaoAberto}
+        onClose={() => setModalEdicaoAberto(false)}
+        evento={eventoEditando}
+        placaId={placaId}
+        enderecoPlaca={enderecoPlaca}
+        onSuccess={() => {
+          setPage(1); 
         }}
       />
     </>

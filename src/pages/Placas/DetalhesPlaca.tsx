@@ -112,6 +112,7 @@ export function ConteudoDetalhesPlaca({ dados, placaId }: { dados: DadosDetalhes
           placaId={placaId}
           open={modalOpen}
           onClose={() => setModalOpen(false)}
+          enderecoPlaca={placa.endereco}
         />
       </section>
     </div>
