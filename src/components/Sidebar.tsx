@@ -16,6 +16,7 @@ const items = [
   { path: '/placas', label: 'Placas', Icon: ReportOutlinedIcon },
   { path: '/estatisticas', label: 'Estatísticas', Icon: ShowChartOutlinedIcon },
   { path: '/agentes', label: 'Agentes', Icon: PersonOutlinedIcon },
+  { path: '/meu-perfil', label: 'Meu perfil', Icon: PersonOutlinedIcon },
 ];
 
 export function Sidebar() {
