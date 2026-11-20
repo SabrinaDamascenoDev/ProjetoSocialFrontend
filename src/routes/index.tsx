@@ -11,6 +11,7 @@ import { RedefinirSenha } from '../pages/RecuperarSenha/RedefinirSenha';
 import { SenhaRedefinida } from '../pages/RecuperarSenha/SenhaRedefinida';
 import { DetalhesPlaca } from '../pages/Placas/DetalhesPlaca';
 import { Placas } from '../pages/Placas/Placas';
+import { MeuPerfil } from '../pages/MeuPerfil/MeuPerfil';
 
 export const routes: RouteObject[] = [
   {
@@ -44,6 +45,10 @@ export const routes: RouteObject[] = [
   {
     element: <PrivateRoute />,
     children: [
+      {
+        path: '/meu-perfil',
+        element: <MeuPerfil />,
+      },
       {
         index: true,
         element: <ModulePlaceholder title="Dashboard" />,
